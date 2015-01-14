@@ -1,0 +1,173 @@
+source ~/.vim/functions.vim
+
+set nocompatible
+
+"
+" Visual
+"
+
+syntax on
+set number
+set ruler
+set guioptions=ce
+" Briefly jump to a paren once it's balanced
+set showmatch
+set linespace=2
+set cursorline
+set background=dark
+colorscheme solarized
+" Great colors
+set t_Co=256
+if version >= 730
+  set colorcolumn=79
+endif
+set textwidth=78
+set encoding=utf-8
+
+" Tabs/Whitespace
+set tabstop=2
+set shiftwidth=2
+set softtabstop=2
+set autoindent
+set smarttab
+set expandtab
+set wrap
+set list
+set listchars=tab:▸\ ,nbsp:¬,trail:·
+" allow backspacing over everything in insert mode
+set backspace=indent,eol,start
+
+" Misc
+" Don't re-open already opened buffers
+set switchbuf=useopen
+" Avoid moving cursor to BOL when jumping around
+set nostartofline
+" Let cursor move past the last char
+set virtualedit=all
+set whichwrap=b,s,h,l,<,>,[,]
+let mapleader = ','
+" watch for file changes
+set autoread
+set mouse=a
+set fileformats=unix
+
+" Yank text to the OS X clipboard
+noremap <leader>y "*y
+noremap <leader>yy "*Y
+" Preserve indentation while pasting text from the OS X clipboard
+noremap <leader>p :set paste<CR>:put  *<CR>:set nopaste<CR>
+nmap <leader>n :NERDTreeToggle<cr>
+" line numering trick
+nnoremap <leader>l :call g:ToggleNuMode()<cr>
+
+" Bells
+" No blinking
+set novisualbell
+" No noise.
+set noerrorbells
+" disable any beeps or flashes on error
+set vb t_vb=
+
+" Searching
+set hlsearch
+set incsearch
+set ignorecase
+set smartcase
+
+" Tab completion
+set wildmode=list:longest,list:full
+set wildignore+=*.o,*.obj,.git,*.pyc,*.swp,*.class
+
+" Status bar
+set laststatus=2
+set statusline=%<%f\ %h%m%r%{fugitive#statusline()}%=\ [TYPE=%Y]\ [POS=%04l,%04c%V]\ [LEN=%L]
+
+" Directories for swp files
+" persistent undos
+if version >= 730
+  set undofile
+  set undodir=~/.vim/tmp/undos
+endif
+
+set backupdir=~/.vim/tmp/backups
+set directory=~/.vim/tmp/swaps
+
+" Nicer text navigation
+nmap j gj
+nmap k gk
+
+" easier insert quitinfdg
+imap ;; <ESC>
+map ;; <ESC>
+
+" Reselect visual block after adjusting indentation
+vnoremap < <gv
+vnoremap > >gv
+
+" Nicer splitting
+set splitbelow
+set splitright
+
+" Move around in insert mode
+inoremap <C-h> <left>
+inoremap <C-k> <up>
+inoremap <C-j> <down>
+inoremap <C-l> <right>
+
+" Tab navigation
+map th :tabfirst<CR>
+map tj :tabnext<CR>
+map tk :tabprev<CR>
+map tl :tablast<CR>
+map tt :tabnew<CR>
+
+"
+" Auto commands
+"
+
+" NERDTree on startup and focus on the other buffer
+autocmd VimEnter * NERDTree
+autocmd VimEnter * wincmd p
+" Close vim if NERDTree is the only buffer left
+autocmd WinEnter * call CloseIfOnlyNerdTreeLeft()
+" Remove trailing whitespaces
+autocmd! BufWritePre * :call StripTrailingWhitespaces()
+" git configure
+autocmd! BufRead,BufNewFile gitconfig set ft=gitconfig
+" avro schema filetype
+autocmd! BufRead,BufNewFile *.avsc set ft=javascript
+" protobuf filetype
+autocmd! BufRead,BufNewFile *.proto setfiletype proto
+" Auto save files on window blur
+autocmd! FocusLost * :silent! up
+" make use real tabs
+autocmd! FileType make set noexpandtab
+" go automatic formatting on save
+autocmd! FileType go au BufWritePre <buffer> Fmt
+
+"
+" Bundles
+"
+
+" setup pathogen
+source ~/.vim/bundle/vim-pathogen/autoload/pathogen.vim
+execute pathogen#infect()
+
+" nerdtree
+let g:NERDTreeIgnore      = ['\.rbc$', '\~$', '.DS_Store$']
+let g:NERDTreeChDirMode   = 2
+let g:NERDTreeMouseMode   = 3
+let g:NERDTreeMinimalUI   = 1
+let g:NERDTreeDirArrows   = 1
+let g:NERDTreeHijackNetrw = 0
+let g:NERDTreeWinsize     = 30
+
+filetype plugin indent on
+
+if filereadable(expand('~/.vimrc.local'))
+  source ~/.vimrc.local
+endif
+
+" autoload sesion
+let g:session_autoload = "yes"
+let g:session_autosave = "no"
