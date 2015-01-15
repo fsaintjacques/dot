@@ -27,9 +27,6 @@ zle -N edit-command-line
 bindkey '^xe' edit-command-line
 bindkey '^x^e' edit-command-line
 
-# autoload screen
-# if [[ $STY = '' ]] then screen -xR; fi
-
 fpath=($SHELL_FILES/completions $fpath)
 
 setopt alwaystoend             # when complete from middle, move cursor
@@ -62,3 +59,7 @@ autoload -U select-word-style
 select-word-style bash
 
 REPORTTIME=2
+
+if [ -e /usr/libexec/java_home ]; then
+  export JAVA_HOME=$(/usr/libexec/java_home -v ${JAVA_VERSION:-1.7})
+fi
