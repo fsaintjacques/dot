@@ -8,4 +8,4 @@ install-%: %
 uninstall: uninstall-gitconfig uninstall-gitignore
 
 uninstall-%: %
-	@rm ~/.$<
+	@rm -f ~/.$<

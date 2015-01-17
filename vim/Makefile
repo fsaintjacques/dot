@@ -11,7 +11,7 @@ install-vim:
 uninstall: uninstall-vimrc uninstall-vim
 
 uninstall-%: %
-	@rm ~/.$<
+	@rm -f ~/.$<
 
 uninstall-vim:
-	@rm -r ~/.vim
+	@rm -rf ~/.vim

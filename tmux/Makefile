@@ -10,4 +10,4 @@ install-%: %
 uninstall: uninstall-tmux.conf
 
 uninstall-%: %
-	@rm ~/.$<
+	@rm -f ~/.$<

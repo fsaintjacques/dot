@@ -11,7 +11,7 @@ install-%: %
 uninstall: uninstall-prezto uninstall-zprofile uninstall-zshrc uninstall-zpreztorc uninstall-zshenv
 
 uninstall-prezto:
-	@rm -r ~/.zprezto
+	@rm -rf ~/.zprezto
 
 uninstall-%: %
-	@rm ~/.$<
+	@rm -f ~/.$<

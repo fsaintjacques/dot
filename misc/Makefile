@@ -12,7 +12,7 @@ install-htoprc:
 uninstall: uninstall-inputrc uninstall-toprc uninstall-htoprc
 
 uninstall-%: %
-	@rm ~/.$<
+	@rm -f ~/.$<
 
 uninstall-htoprc:
-	@rm ~/.config/htop/htoprc
+	@rm -f ~/.config/htop/htoprc
