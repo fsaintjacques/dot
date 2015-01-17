@@ -1,15 +1,21 @@
 .PHONY: install
 
-install:
-	@make -C git $@
-	@make -C misc $@
-	@make -C prezto $@
-	@make -C tmux $@
-	@make -C vim $@
+install: \
+	install-git \
+	install-misc \
+	install-prezto \
+	install-tmux \
+	install-vim
 
-uninstall:
-	@make -C git $@
-	@make -C misc $@
-	@make -C prezto $@
-	@make -C tmux $@
-	@make -C vim $@
+install-%: %
+	@make -C $< install
+
+uninstall: \
+	uninstall-git \
+	uninstall-misc \
+	uninstall-prezto \
+	uninstall-tmux \
+	uninstall-vim
+
+uninstall-%: %
+	@make -C $< uninstall
