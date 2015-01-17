@@ -6,3 +6,10 @@ install:
 	@make -C prezto $@
 	@make -C tmux $@
 	@make -C vim $@
+
+uninstall:
+	@make -C git $@
+	@make -C misc $@
+	@make -C prezto $@
+	@make -C tmux $@
+	@make -C vim $@

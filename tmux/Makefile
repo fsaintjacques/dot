@@ -6,3 +6,8 @@ install-tmux.conf: tmux.conf
 
 install-%: %
 	@ln -sf $(CURDIR)/$< ~/.$<
+
+uninstall: uninstall-tmux.conf
+
+uninstall-%: %
+	@rm ~/.$<
