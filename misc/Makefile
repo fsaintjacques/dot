@@ -15,4 +15,4 @@ uninstall-%: %
 	@rm ~/.$<
 
 uninstall-htoprc:
-	@rm .config/htop/htoprc
+	@rm ~/.config/htop/htoprc
