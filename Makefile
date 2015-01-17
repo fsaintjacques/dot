@@ -12,4 +12,4 @@ $(SUBDIRS):
 uninstall: $(USUBDIRS)
 
 $(USUBDIRS):
-	@echo make -C $(@:-uninstall=) uninstall
+	@make -C $(@:-uninstall=) uninstall
