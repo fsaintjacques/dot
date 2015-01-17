@@ -1,0 +1,25 @@
+#!/usr/bin/env bash
+
+set -o errexit -o nounset -o pipefail
+
+: ${DOT_REPO:=https://github.com/fsaintjacques/dot}
+: ${DOT_DIR:=~/src/dot}
+
+function clone_dot {
+  local parent_dir=$(dirname "${DOT_DIR}")
+
+  if [ ! -d "${parent_dir}" ]; then
+    mkdir -p "${parent_dir}"
+  fi
+
+  if [ ! -d "${DOT_DIR}" ]; then
+    git clone "${DOT_REPO}" "${DOT_DIR}"
+  fi
+}
+
+function install_dot {
+  make -C ${DOT_DIR} install
+}
+
+clone_dot
+install_dot
