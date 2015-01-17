@@ -1,4 +1,4 @@
-.PHONY: install
+.PHONY: install install-% uninstall uninstall-%
 
 install: \
 	install-git \
