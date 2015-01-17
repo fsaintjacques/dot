@@ -1,21 +1,15 @@
-.PHONY: install install-% uninstall uninstall-%
+SUBDIRS = git misc prezto tmux vim
+# cheat used to create fake target
+USUBDIRS =$(SUBDIRS:=-uninstall)
 
-install: \
-	install-git \
-	install-misc \
-	install-prezto \
-	install-tmux \
-	install-vim
+.PHONY: install $(SUBDIRS) uninstall $(USUBDIRS)
 
-install-%: %
-	@make -C $< install
+install: $(SUBDIRS)
 
-uninstall: \
-	uninstall-git \
-	uninstall-misc \
-	uninstall-prezto \
-	uninstall-tmux \
-	uninstall-vim
+$(SUBDIRS):
+	@make -C $@ install
 
-uninstall-%: %
-	@make -C $< uninstall
+uninstall: $(USUBDIRS)
+
+$(USUBDIRS):
+	@echo make -C $(@:-uninstall=) uninstall
