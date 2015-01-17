@@ -56,8 +56,3 @@ setopt sh_word_split           # commands will be split on space (i.e. $VISUAL =
 autoload -U select-word-style
 select-word-style bash
 
-REPORTTIME=2
-
-if [ -e /usr/libexec/java_home ]; then
-  export JAVA_HOME=$(/usr/libexec/java_home -v ${JAVA_VERSION:-1.7})
-fi
