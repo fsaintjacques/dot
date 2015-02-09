@@ -9,7 +9,7 @@ fsaintjacques configuration files for:
 
 ## INSTALLATION
 
-    curl -L https://raw.github.com/fsaintjacques/dot/master/tools/install | bash
+    curl -L https://raw.githubusercontent.com/fsaintjacques/dot/master/tools/install | bash
 
 or
 
