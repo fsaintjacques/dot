@@ -85,3 +85,7 @@ REPORTTIME=2
 if [[ -e /usr/libexec/java_home ]]; then
   export JAVA_HOME=$(/usr/libexec/java_home -v ${JAVA_VERSION:-1.8})
 fi
+
+if [[ -d ~/.rvm/bin ]]; then
+  export PATH="$PATH:$HOME/.rvm/bin" # Add RVM to PATH for scripting
+fi

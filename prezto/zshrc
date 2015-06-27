@@ -59,7 +59,3 @@ select-word-style bash
 if [[ -s ~/.zshrc-local ]]; then
   source ~/.zshrc-local
 fi
-
-if [[ -d ~/.rvm/bin ]]; then
-  export PATH="$PATH:$HOME/.rvm/bin" # Add RVM to PATH for scripting
-fi
