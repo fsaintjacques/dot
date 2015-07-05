@@ -143,8 +143,8 @@ autocmd! BufRead,BufNewFile *.proto setfiletype proto
 autocmd! FocusLost * :silent! up
 " make use real tabs
 autocmd! FileType make set noexpandtab
-" go automatic formatting on save
-autocmd! FileType go au BufWritePre <buffer> Fmt
+" automatic formatting on save
+autocmd! BufWrite * :Autoformat
 
 "
 " Bundles
