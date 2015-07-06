@@ -24,6 +24,7 @@
   autosetuprebase = local
 [push]
   default = matching
+  followTags = true
 [pull]
   ff = only
   rebase = preserve
