@@ -144,7 +144,7 @@ autocmd! FocusLost * :silent! up
 " make use real tabs
 autocmd! FileType make set noexpandtab
 " automatic formatting on save
-autocmd! BufWrite * :Autoformat
+autocmd! BufWrite *.h,*.c,*.cc,*.cpp :Autoformat
 
 "
 " Bundles
