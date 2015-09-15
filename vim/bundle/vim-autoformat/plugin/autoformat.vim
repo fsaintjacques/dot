@@ -190,7 +190,14 @@ endfunction
 
 " Create a command for formatting the entire buffer
 " Save and recall window state to prevent vim from jumping to line 1
-command! -nargs=? -range=% -complete=filetype Autoformat let winview=winsaveview()|<line1>,<line2>call s:TryAllFormatters(<f-args>)|call winrestview(winview)
+"
+" This is a custom patched version to support CentOS 6 running vim 7.1, see
+" https://github.com/Chiel92/vim-autoformat/issues/38
+if version >= 730
+  command! -nargs=? -range=% -complete=filetype Autoformat let winview=winsaveview()|<line1>,<line2>call s:TryAllFormatters(<f-args>)|call winrestview(winview)
+else
+  command! Autoformat call s:Autoformat()
+endif
 
 
 " Functions for iterating through list of available formatters
