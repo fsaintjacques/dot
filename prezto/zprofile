@@ -36,10 +36,22 @@ fi
 # Ensure path arrays do not contain duplicates.
 typeset -gU cdpath fpath mailpath path
 
-# Set the the list of directories that cd searches.
-# cdpath=(
-#   $cdpath
-# )
+if [[ -e /usr/libexec/java_home ]]; then
+  export JAVA_HOME=$(/usr/libexec/java_home -v ${JAVA_VERSION:-1.8})
+fi
+
+for p in ~/.rvm/bin \
+         ~/.usr/bin; do
+  if [[ -d "$p" ]]; then
+    path=($p
+          $path)
+  fi
+done
+
+if [[ -d ~/.bin ]]; then
+  path=($path,
+        ~/.bin)
+fi
 
 # Set the list of directories that Zsh searches for programs.
 path=(
@@ -82,17 +94,4 @@ export LS_COLORS='no=00:fi=00:di=01;34:ln=00;36:pi=40;33:so=01;35:do=01;35:bd=40
 
 REPORTTIME=2
 
-if [[ -e /usr/libexec/java_home ]]; then
-  export JAVA_HOME=$(/usr/libexec/java_home -v ${JAVA_VERSION:-1.8})
-fi
 
-for p in ~/.rvm/bin \
-         ~/.usr/bin; do
-  if [[ -d "$p" ]]; then
-    export PATH="$PATH:$p"
-  fi
-done
-
-if [[ -d ~/.bin ]]; then
-  export PATH="$PATH:~/.bin"
-fi

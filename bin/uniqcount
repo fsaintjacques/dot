@@ -1,4 +1,4 @@
-#!/bin/gawk -f
+#!/usr/bin/awk -f
 
 {strings[$1]++}
 END { for (string in strings) {print strings[string],string} }
