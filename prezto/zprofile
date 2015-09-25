@@ -92,3 +92,7 @@ for p in ~/.rvm/bin \
     export PATH="$PATH:$p"
   fi
 done
+
+if [[ -d ~/.bin ]]; then
+  export PATH="$PATH:~/.bin"
+fi

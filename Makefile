@@ -1,4 +1,4 @@
-SUBDIRS = git misc prezto tmux vim
+SUBDIRS = git misc prezto tmux vim bin
 # cheat used to create fake target
 USUBDIRS =$(SUBDIRS:=-uninstall)
 
