@@ -49,7 +49,7 @@ for p in ~/.rvm/bin \
 done
 
 if [[ -d ~/.bin ]]; then
-  path=($path,
+  path=($path
         ~/.bin)
 fi
 
