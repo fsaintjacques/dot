@@ -60,6 +60,8 @@ endfunction
 function! s:TryAllFormatters(...) range
     " Make sure formatters are defined and detected
     if !call('<SID>find_formatters', a:000)
+        " No formatters defined, so autoindent code
+        exe "normal gg=G"
         return 0
     endif
 
@@ -105,14 +107,11 @@ function! s:TryAllFormatters(...) range
         endif
 
         if s:index == b:current_formatter_index
-            " Tried all formatters, none worked
+            " Tried all formatters, none worked so autoindent code
+            exe "normal gg=G"
             return 0
         endif
     endwhile
-
-
-    " Autoindent code if no formatters work
-    exe "normal gg=G"
 
 endfunction
 
@@ -130,7 +129,7 @@ python << EOF
 import vim, subprocess, os
 from subprocess import Popen, PIPE
 
-text = '\n'.join(vim.current.buffer[:])
+text = os.linesep.join(vim.current.buffer[:]) + os.linesep
 formatprg = vim.eval('&formatprg')
 verbose = bool(int(vim.eval('verbose')))
 env = os.environ.copy()
@@ -147,7 +146,23 @@ if stderrdata:
         print('Failing config: {} '.format(repr(formatprg), stderrdata))
     vim.command('return 0')
 else:
-    vim.current.buffer[:] = stdoutdata.split('\n')
+    # It is not certain what kind of line endings are being used by the format program.
+    # Therefore we simply split on all possible eol characters.
+    possible_eols = ['\r\n', os.linesep, '\r', '\n']
+
+    # Often shell commands will append a newline at the end of their output.
+    # It is not entirely clear when and why that happens.
+    # However, extra newlines are almost never required, while there are linters that complain
+    # about superfluous newlines, so we remove one empty newline at the end of the file.
+    for eol in possible_eols:
+        if stdoutdata[-1] == eol:
+            stdoutdata = stdoutdata[:-1]
+
+    lines = [stdoutdata]
+    for eol in possible_eols:
+        lines = [splitline for line in lines for splitline in line.split(eol)]
+
+    vim.current.buffer[:] = lines
 EOF
 
     return 1
@@ -162,8 +177,7 @@ python3 << EOF
 import vim, subprocess, os
 from subprocess import Popen, PIPE
 
-#text = '\n'.join(vim.current.buffer[:])
-text = bytes('\n'.join(vim.current.buffer[:]), 'utf-8')
+text = bytes(os.linesep.join(vim.current.buffer[:]) + os.linesep, 'utf-8')
 formatprg = vim.eval('&formatprg')
 verbose = bool(int(vim.eval('verbose')))
 env = os.environ.copy()
@@ -180,8 +194,25 @@ if stderrdata:
         print('Failing config: {} '.format(repr(formatprg), stderrdata))
     vim.command('return 0')
 else:
-    #vim.current.buffer[:] = stdoutdata.split('\n')
-    vim.current.buffer[:] = stdoutdata.split(b'\n')
+    # It is not certain what kind of line endings are being used by the format program.
+    # Therefore we simply split on all possible eol characters.
+    possible_eols = ['\r\n', os.linesep, '\r', '\n']
+
+    stdoutdata = stdoutdata.decode('utf-8')
+
+    # Often shell commands will append a newline at the end of their output.
+    # It is not entirely clear when and why that happens.
+    # However, extra newlines are almost never required, while there are linters that complain
+    # about superfluous newlines, so we remove one empty newline at the end of the file.
+    for eol in possible_eols:
+        if stdoutdata[-1] == eol:
+            stdoutdata = stdoutdata[:-1]
+
+    lines = [stdoutdata]
+    for eol in possible_eols:
+        lines = [splitline for line in lines for splitline in line.split(eol)]
+
+    vim.current.buffer[:] = lines
 EOF
 
     return 1
@@ -193,10 +224,10 @@ endfunction
 "
 " This is a custom patched version to support CentOS 6 running vim 7.1, see
 " https://github.com/Chiel92/vim-autoformat/issues/38
-if version >= 730
-  command! -nargs=? -range=% -complete=filetype Autoformat let winview=winsaveview()|<line1>,<line2>call s:TryAllFormatters(<f-args>)|call winrestview(winview)
+if v:version >= 703
+    command! -nargs=? -range=% -complete=filetype Autoformat let winview=winsaveview()|<line1>,<line2>call s:TryAllFormatters(<f-args>)|call winrestview(winview)
 else
-  command! Autoformat call s:Autoformat()
+    command! Autoformat call s:Autoformat()
 endif
 
 
