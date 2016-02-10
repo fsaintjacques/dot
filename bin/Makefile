@@ -1,7 +1,7 @@
 .PHONY: install
 
 install:
-	@ln -sf $(CURDIR) ~/.bin
+	@ln -sf $(shell pwd)/ ~/.bin
 
 uninstall:
 
