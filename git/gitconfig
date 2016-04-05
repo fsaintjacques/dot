@@ -1,6 +1,7 @@
 [user]
   name = François Saint-Jacques
   email = fsaintjacques@gmail.com
+	signingkey = 840582F70B817300
 [merge]
   summary = true
   tool = opendiff
