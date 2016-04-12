@@ -15,7 +15,7 @@ set showmatch
 set linespace=2
 set cursorline
 set background=dark
-colorscheme solarized
+colorscheme gruvbox
 " Great colors
 set t_Co=256
 if version >= 730
