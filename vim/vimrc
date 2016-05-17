@@ -2,39 +2,63 @@ source ~/.vim/functions.vim
 
 set nocompatible
 
-"
-" Visual
-"
 
-syntax on
+"" Visual
+" Show line number
 set number
-set ruler
-set guioptions=ce
+" Show highlighted cursor line
+set cursorline
 " Briefly jump to a paren once it's balanced
 set showmatch
-set linespace=2
-set cursorline
-set background=dark
-colorscheme gruvbox
-" Great colors
-set t_Co=256
-if version >= 730
-  set colorcolumn=79
-endif
-set textwidth=78
-set encoding=utf-8
-
-" Tabs/Whitespace
-set tabstop=2
-set shiftwidth=2
-set softtabstop=2
-set autoindent
-set smarttab
-set expandtab
-set wrap
+" Visual hints for pesky characters
 set list
 set listchars=tab:▸\ ,nbsp:¬,trail:·
-" allow backspacing over everything in insert mode
+" Highlight code syntax
+syntax on
+
+""" Colors
+colorscheme gruvbox
+set background=dark
+" Number of colors
+set t_Co=256
+
+""" Columns
+set textwidth=79
+if exists('+colorcolumn')
+  " Sets column colorization at `$textwidth + 1`
+  set colorcolumn=+1
+endif
+" When on, lines longer than the width of the window will wrap and
+" displaying continues on the next line.
+set wrap
+" Allow specified keys that move the cursor left/right to move to the
+" previous/next line when the cursor is on the first/last character in
+" the line.
+set whichwrap=b,s,h,l,<,>,[,]
+
+""" Encodings
+set encoding=utf-8
+" `\n` shall rule the land and beyond
+set fileformat=unix
+
+""" Tabs/Whitespace
+" Insert space characters whenever the tab key is pressed
+set expandtab
+" Number of space characters that will be inserted when the tab key is pressed
+set tabstop=2
+" Number of space characters inserted for indentation
+set shiftwidth=2
+" Copy the indentation from the previous line, when starting a new line
+set autoindent
+
+" Allow backspacing over everything in insert mode. Each item allows a way to
+" backspace over something:
+"
+" value   effect
+" indent  allow backspacing over autoindent
+" eol     allow backspacing over line breaks (join lines)
+" start   allow backspacing over the start of insert; CTRL-W and CTRL-U
+"               stop once at the start of insert.
 set backspace=indent,eol,start
 
 " Misc
@@ -44,39 +68,31 @@ set switchbuf=useopen
 set nostartofline
 " Let cursor move past the last char
 set virtualedit=all
-set whichwrap=b,s,h,l,<,>,[,]
-let mapleader = ','
-" watch for file changes
+" Watch for file changes
 set autoread
+
+""" Movement
+
+let mapleader = ','
+" Enable the use of the mouse
 set mouse=a
-set fileformats=unix
 
-" Yank text to the OS X clipboard
-noremap <leader>y "*y
-noremap <leader>yy "*Y
-" Preserve indentation while pasting text from the OS X clipboard
-noremap <leader>p :set paste<CR>:put  *<CR>:set nopaste<CR>
-nmap <leader>n :NERDTreeToggle<cr>
-" line numering trick
-nnoremap <leader>l :call g:ToggleNuMode()<cr>
-
-" Bells
-" No blinking
-set novisualbell
-" No noise.
-set noerrorbells
-" disable any beeps or flashes on error
-set vb t_vb=
+" Switch line-numbering from absolute/relative
+nnoremap <leader>l :set relativenumber!<cr>
 
 " Searching
+" When there is a previous search pattern, highlight all its matches. The type
+" of highlighting used can be set with the 'l' occasion in the 'highlight'
+" option.
 set hlsearch
+" While typing a search command, show where the pattern, as it was typed so
+" far, matches. The matched string is highlighted. If the pattern is invalid
+" or not found, nothing is shown.
 set incsearch
+" If 'ignorecase' and 'smartcase' are set and the command line has no
+" uppercase characters, the added character is converted to lowercase.
 set ignorecase
 set smartcase
-
-" Tab completion
-set wildmode=list:longest,list:full
-set wildignore+=*.o,*.obj,.git,*.pyc,*.swp,*.class
 
 " Status bar
 set laststatus=2
@@ -84,18 +100,30 @@ set statusline=%<%f\ %h%m%r%{fugitive#statusline()}%=\ [TYPE=%Y]\ [POS=%04l,%04c
 
 " Directories for swp files
 " persistent undos
-if version >= 730
+if exists('+undofile')
   set undofile
   set undodir=~/.vim/tmp/undos
 endif
-
 set backupdir=~/.vim/tmp/backups
 set directory=~/.vim/tmp/swaps
 set viminfo+=n~/.vim/tmp/viminfo
 
 " Nicer text navigation
-nmap j gj
-nmap k gk
+" The problem with the often used
+" ```
+" noremap j gj
+" noremap k gk
+" ```
+" option is, that it breaks the <vcount> functionality, if you have lines in
+" your text, which span across multiple lines.
+" Example: you want 10k (go UP 10 lines), because you use relative numbers in
+" the sidebar, but theres a multiline with 4 lines height. Therefore you end
+" up effectively at 6 lines (6k) above your desired line, which you read from
+" your relative numbers. You'd have to calculate manually! Annoying...
+" Especially if you have multiple multiline between your current position and
+" your desired position - not Vim-istic!
+noremap <silent> <expr> j (v:count == 0 ? 'gj' : 'j')
+noremap <silent> <expr> k (v:count == 0 ? 'gk' : 'k')
 
 " easier insert quitinfdg
 imap ;; <ESC>
@@ -155,6 +183,7 @@ source ~/.vim/bundle/vim-pathogen/autoload/pathogen.vim
 execute pathogen#infect()
 
 " nerdtree
+nmap <leader>n :NERDTreeToggle<cr>
 let g:NERDTreeIgnore      = ['\.rbc$', '\~$', '.DS_Store$']
 let g:NERDTreeChDirMode   = 2
 let g:NERDTreeMouseMode   = 3
