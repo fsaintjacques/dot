@@ -1193,6 +1193,9 @@ set print array off
 set print array-indexes on
 set python print-stack full
 
+# make cmocka raise SIGABRT on failed asserts when debuging
+set environment CMOCKA_TEST_ABORT=1
+
 # Start ------------------------------------------------------------------------
 
 python Dashboard.start()
