@@ -170,6 +170,8 @@ autocmd! FocusLost * :silent! up
 autocmd! FileType make set noexpandtab
 " automatic formatting on save
 autocmd! BufWrite *.h,*.c,*.cc,*.cpp :Autoformat
+" QuickFix window close automatically when selecting a file
+autocmd! FileType qf nnoremap <buffer> <CR> <C-w><CR>:cclose<CR>
 
 "
 " Bundles
@@ -189,6 +191,9 @@ let g:NERDTreeDirArrows   = 1
 let g:NERDTreeHijackNetrw = 0
 let g:NERDTreeWinsize     = 30
 
+" ctrlp
+nmap <leader>p :CtrlPMixed
+
 filetype plugin indent on
 
 if filereadable(expand('~/.vimrc.local'))
@@ -198,3 +203,19 @@ endif
 " autoload sesion
 let g:session_autoload = "yes"
 let g:session_autosave = "no"
+
+" The Silver Searcher
+if executable('ag')
+  " Use ag over grep
+  set grepprg=ag\ --nogroup\ --nocolor
+
+  " Use ag in CtrlP for listing files. Lightning fast and respects .gitignore
+  let g:ctrlp_user_command = 'ag %s -l --nocolor -g ""'
+
+  " ag is fast enough that CtrlP doesn't need to cache
+  let g:ctrlp_use_caching = 0
+
+  command -nargs=+ -complete=file -bar Ag silent! grep! <args>|cwindow|redraw!
+  nnoremap \ :Ag<SPACE>
+  nnoremap <leader>s :grep! "\b<C-R><C-W>\b"<CR>:cw<CR><CR>
+endif
