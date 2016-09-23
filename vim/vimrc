@@ -154,9 +154,6 @@ map tt :tabnew<CR>
 " Auto commands
 "
 
-" NERDTree on startup and focus on the other buffer
-autocmd VimEnter * NERDTree
-autocmd VimEnter * wincmd p
 " Close vim if NERDTree is the only buffer left
 autocmd WinEnter * call CloseIfOnlyNerdTreeLeft()
 " Remove trailing whitespaces
