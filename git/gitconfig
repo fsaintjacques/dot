@@ -21,6 +21,7 @@
   excludesfile = ~/.gitignore
   whitespace = fix
   pager = diff-highlight | less -r
+  hookspath = ~/src/dot/git/hooks
 [branch]
   autosetupmerge = always
   autosetuprebase = local
