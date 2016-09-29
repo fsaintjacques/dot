@@ -172,6 +172,10 @@ autocmd! FileType make set noexpandtab
 autocmd! BufWrite *.h,*.c,*.cc,*.cpp :Autoformat
 " QuickFix window close automatically when selecting a file
 autocmd! FileType qf nnoremap <buffer> <CR> <C-w><CR>:cclose<CR>
+" aspell commit messages if possible
+if executable('ag')
+    autocmd BufWritePre GIT_COMMIT !aspell -c %
+endif
 
 "
 " Bundles
