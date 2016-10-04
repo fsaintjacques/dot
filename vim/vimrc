@@ -187,6 +187,11 @@ endif
 source ~/.vim/bundle/vim-pathogen/autoload/pathogen.vim
 execute pathogen#infect()
 
+" vim-fugitive
+"
+nmap <leader>gs :Gstatus<cr>
+nmap <leader>gc :Gcommit<cr>
+
 " autoformat configurations
 let g:autoformat_autoindent = 1
 let g:autoformat_retab = 1
