@@ -187,6 +187,12 @@ endif
 source ~/.vim/bundle/vim-pathogen/autoload/pathogen.vim
 execute pathogen#infect()
 
+" autoformat configurations
+let g:autoformat_autoindent = 1
+let g:autoformat_retab = 1
+let g:autoformat_remove_trailing_spaces = 1
+let g:autoformat_verbosemode = 0
+
 " nerdtree
 nmap <leader>n :NERDTreeToggle<cr>
 let g:NERDTreeIgnore      = ['\.rbc$', '\~$', '.DS_Store$']
