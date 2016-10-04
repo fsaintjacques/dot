@@ -1,14 +1,19 @@
 " Function for finding the formatters for this filetype
 " Result is stored in b:formatters
+
+if !exists('g:autoformat_autoindent')
+    let g:autoformat_autoindent = 1
+endif
+
 function! s:find_formatters(...)
     " Detect verbosity
-    let verbose = &verbose || exists("g:autoformat_verbosemode")
+    let verbose = &verbose || g:autoformat_verbosemode == 1
 
     " Extract filetype to be used
     let ftype = a:0 ? a:1 : &filetype
     " Support composite filetypes by replacing dots with underscores
     let compoundtype = substitute(ftype, "[.]", "_", "g")
-    if ftype =~ "[.]"
+    if ftype =~? "[.]"
         " Try all super filetypes in search for formatters in a sane order
         let ftypes = [compoundtype] + split(ftype, "[.]")
     else
@@ -28,16 +33,19 @@ function! s:find_formatters(...)
     " Detect configuration for all possible ftypes
     let b:formatters = []
     for supertype in ftypes
-        let formatters_var = "g:formatters_".supertype
+        let formatters_var = "b:formatters_".supertype
+        if !exists(formatters_var)
+            let formatters_var = "g:formatters_".supertype
+        endif
         if !exists(formatters_var)
             " No formatters defined
             if verbose
-                echoerr "No formatters defined for supertype '".supertype
+                echoerr "No formatters defined for supertype ".supertype
             endif
         else
             let formatters = eval(formatters_var)
-            if type(formatters) != 3
-                echoerr formatter_var." is not a list"
+            if type(formatters) != type([])
+                echoerr formatters_var." is not a list"
             else
                 let b:formatters = b:formatters + formatters
             endif
@@ -58,10 +66,16 @@ endfunction
 " Try all formatters, starting with the currently selected one, until one
 " works. If none works, autoindent the buffer.
 function! s:TryAllFormatters(...) range
+    " Detect verbosity
+    let verbose = &verbose || g:autoformat_verbosemode == 1
+
     " Make sure formatters are defined and detected
     if !call('<SID>find_formatters', a:000)
-        " No formatters defined, so autoindent code
-        exe "normal gg=G"
+        " No formatters defined
+        if verbose
+            echomsg "No format definitions are defined for this filetype."
+        endif
+        call s:Fallback()
         return 0
     endif
 
@@ -77,8 +91,11 @@ function! s:TryAllFormatters(...) range
     let s:index = b:current_formatter_index
 
     while 1
-        let formatdef_var = 'g:formatdef_'.b:formatters[s:index]
         " Formatter definition must be existent
+        let formatdef_var = 'b:formatdef_'.b:formatters[s:index]
+        if !exists(formatdef_var)
+            let formatdef_var = 'g:formatdef_'.b:formatters[s:index]
+        endif
         if !exists(formatdef_var)
             echoerr "No format definition found in '".formatdef_var."'."
             return 0
@@ -86,7 +103,7 @@ function! s:TryAllFormatters(...) range
 
         " Eval twice, once for getting definition content,
         " once for getting the final expression
-        let &formatprg = eval(eval(formatdef_var))
+        let b:formatprg = eval(eval(formatdef_var))
 
         " Detect if +python or +python3 is available, and call the corresponding function
         if !has("python") && !has("python3")
@@ -95,23 +112,59 @@ function! s:TryAllFormatters(...) range
                 \ echohl None
             return 1
         endif
-        if has("python")
-            let success = s:TryFormatterPython()
-        else
+        if has("python3")
             let success = s:TryFormatterPython3()
+        else
+            let success = s:TryFormatterPython()
         endif
         if success
+            if verbose
+                echomsg "Definition in '".formatdef_var."' was successful."
+            endif
             return 1
         else
+            if verbose
+                echomsg "Definition in '".formatdef_var."' was unsuccessful."
+            endif
             let s:index = (s:index + 1) % len(b:formatters)
         endif
 
         if s:index == b:current_formatter_index
-            " Tried all formatters, none worked so autoindent code
-            exe "normal gg=G"
+            if verbose
+                echomsg "No format definitions were successful."
+            endif
+            " Tried all formatters, none worked
+            call s:Fallback()
             return 0
         endif
     endwhile
+endfunction
+
+function! s:Fallback()
+    " Detect verbosity
+    let verbose = &verbose || g:autoformat_verbosemode == 1
+
+    if exists('b:autoformat_remove_trailing_spaces') ? b:autoformat_remove_trailing_spaces == 1 : g:autoformat_remove_trailing_spaces == 1
+        if verbose
+            echomsg "Removing trailing whitespace..."
+        endif
+        call s:RemoveTrailingSpaces()
+    endif
+
+    if exists('b:autoformat_retab') ? b:autoformat_retab == 1 : g:autoformat_retab == 1
+        if verbose
+            echomsg "Retabbing..."
+        endif
+        retab
+    endif
+
+    if exists('b:autoformat_autoindent') ? b:autoformat_autoindent == 1 : g:autoformat_autoindent == 1
+        if verbose
+            echomsg "Autoindenting..."
+        endif
+        " Autoindent code
+        exe "normal gg=G"
+    endif
 
 endfunction
 
@@ -123,27 +176,35 @@ endfunction
 " +python version
 function! s:TryFormatterPython()
     " Detect verbosity
-    let verbose = &verbose || exists("g:autoformat_verbosemode")
+    let verbose = &verbose || g:autoformat_verbosemode == 1
 
 python << EOF
 import vim, subprocess, os
 from subprocess import Popen, PIPE
-
 text = os.linesep.join(vim.current.buffer[:]) + os.linesep
-formatprg = vim.eval('&formatprg')
+formatprg = vim.eval('b:formatprg')
 verbose = bool(int(vim.eval('verbose')))
+
 env = os.environ.copy()
 if int(vim.eval('exists("g:formatterpath")')):
     extra_path = vim.eval('g:formatterpath')
     env['PATH'] = ':'.join(extra_path) + ':' + env['PATH']
 
+# When an entry is unicode, Popen can't deal with it in Python 2.
+# As a pragmatic fix, we'll omit that entry.
+newenv = {}
+for key,val in env.iteritems():
+    if type(key) == type(val) == str:
+        newenv[key] = val
+env=newenv
 p = subprocess.Popen(formatprg, env=env, shell=True, stdin=PIPE, stdout=PIPE, stderr=PIPE)
 stdoutdata, stderrdata = p.communicate(text)
+
 if stderrdata:
     if verbose:
         formattername = vim.eval('b:formatters[s:index]')
-        print('Formatter {} has errors: {}. Skipping.'.format(formattername, stderrdata))
-        print('Failing config: {} '.format(repr(formatprg), stderrdata))
+        print('Formatter {} has errors: {} Skipping.'.format(formattername, stderrdata))
+        print('Failing config: {}'.format(repr(formatprg), stderrdata))
     vim.command('return 0')
 else:
     # It is not certain what kind of line endings are being used by the format program.
@@ -155,7 +216,7 @@ else:
     # However, extra newlines are almost never required, while there are linters that complain
     # about superfluous newlines, so we remove one empty newline at the end of the file.
     for eol in possible_eols:
-        if stdoutdata[-1] == eol:
+        if len(stdoutdata) > 0 and stdoutdata[-1] == eol:
             stdoutdata = stdoutdata[:-1]
 
     lines = [stdoutdata]
@@ -171,14 +232,14 @@ endfunction
 " +python3 version
 function! s:TryFormatterPython3()
     " Detect verbosity
-    let verbose = &verbose || exists("g:autoformat_verbosemode")
+    let verbose = &verbose || g:autoformat_verbosemode == 1
 
 python3 << EOF
 import vim, subprocess, os
 from subprocess import Popen, PIPE
 
 text = bytes(os.linesep.join(vim.current.buffer[:]) + os.linesep, 'utf-8')
-formatprg = vim.eval('&formatprg')
+formatprg = vim.eval('b:formatprg')
 verbose = bool(int(vim.eval('verbose')))
 env = os.environ.copy()
 if int(vim.eval('exists("g:formatterpath")')):
@@ -190,8 +251,8 @@ stdoutdata, stderrdata = p.communicate(text)
 if stderrdata:
     if verbose:
         formattername = vim.eval('b:formatters[s:index]')
-        print('Formatter {} has errors: {}. Skipping.'.format(formattername, stderrdata))
-        print('Failing config: {} '.format(repr(formatprg), stderrdata))
+        print('Formatter {} has errors: {} Skipping.'.format(formattername, stderrdata))
+        print('Failing config: {}'.format(repr(formatprg), stderrdata))
     vim.command('return 0')
 else:
     # It is not certain what kind of line endings are being used by the format program.
@@ -205,7 +266,7 @@ else:
     # However, extra newlines are almost never required, while there are linters that complain
     # about superfluous newlines, so we remove one empty newline at the end of the file.
     for eol in possible_eols:
-        if stdoutdata[-1] == eol:
+        if len(stdoutdata) > 0 and stdoutdata[-1] == eol:
             stdoutdata = stdoutdata[:-1]
 
     lines = [stdoutdata]
@@ -219,17 +280,15 @@ EOF
 endfunction
 
 
-" Create a command for formatting the entire buffer
-" Save and recall window state to prevent vim from jumping to line 1
-"
 " This is a custom patched version to support CentOS 6 running vim 7.1, see
 " https://github.com/Chiel92/vim-autoformat/issues/38
 if v:version >= 703
+    " Create a command for formatting the entire buffer
+    " Save and recall window state to prevent vim from jumping to line 1
     command! -nargs=? -range=% -complete=filetype Autoformat let winview=winsaveview()|<line1>,<line2>call s:TryAllFormatters(<f-args>)|call winrestview(winview)
 else
     command! Autoformat call s:Autoformat()
 endif
-
 
 " Functions for iterating through list of available formatters
 function! s:NextFormatter()
@@ -238,7 +297,7 @@ function! s:NextFormatter()
         let b:current_formatter_index = 0
     endif
     let b:current_formatter_index = (b:current_formatter_index + 1) % len(b:formatters)
-    echom 'Selected formatter: '.b:formatters[b:current_formatter_index]
+    echomsg 'Selected formatter: '.b:formatters[b:current_formatter_index]
 endfunction
 
 function! s:PreviousFormatter()
@@ -248,9 +307,33 @@ function! s:PreviousFormatter()
     endif
     let l = len(b:formatters)
     let b:current_formatter_index = (b:current_formatter_index - 1 + l) % l
-    echom 'Selected formatter: '.b:formatters[b:current_formatter_index]
+    echomsg 'Selected formatter: '.b:formatters[b:current_formatter_index]
+endfunction
+
+function! s:CurrentFormatter()
+    call s:find_formatters()
+    if !exists('b:current_formatter_index')
+        let b:current_formatter_index = 0
+    endif
+    echomsg 'Selected formatter: '.b:formatters[b:current_formatter_index]
 endfunction
 
 " Create commands for iterating through formatter list
 command! NextFormatter call s:NextFormatter()
 command! PreviousFormatter call s:PreviousFormatter()
+command! CurrentFormatter call s:CurrentFormatter()
+
+" Other commands
+function! s:RemoveTrailingSpaces()
+    let user_gdefault = &gdefault
+    try
+        set nogdefault
+        silent! %s/\s\+$
+    finally
+        let &gdefault = user_gdefault
+    endtry
+endfunction
+command! RemoveTrailingSpaces call s:RemoveTrailingSpaces()
+
+" Put the uncopyable messages text into the buffer
+command! PutMessages redir @" | messages | redir END | put
