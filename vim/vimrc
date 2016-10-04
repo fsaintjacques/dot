@@ -2,7 +2,6 @@ source ~/.vim/functions.vim
 
 set nocompatible
 
-
 "" Visual
 " Show line number
 set number
@@ -154,18 +153,21 @@ map tt :tabnew<CR>
 " Auto commands
 "
 
-" Close vim if NERDTree is the only buffer left
-autocmd WinEnter * call CloseIfOnlyNerdTreeLeft()
-" Remove trailing whitespaces
-autocmd! BufWritePre * :call StripTrailingWhitespaces()
+" Hints for file types
 " git configure
 autocmd! BufRead,BufNewFile gitconfig set ft=gitconfig
 " avro schema filetype
 autocmd! BufRead,BufNewFile *.avsc set ft=javascript
 " protobuf filetype
-autocmd! BufRead,BufNewFile *.proto setfiletype proto
+autocmd! BufRead,BufNewFile *.proto set ft=proto
+
+" Close vim if NERDTree is the only buffer left
+autocmd! WinEnter * call CloseIfOnlyNerdTreeLeft()
+" Remove trailing whitespaces
+autocmd! BufWritePre * call StripTrailingWhitespaces()
+
 " Auto save files on window blur
-autocmd! FocusLost * :silent! up
+autocmd! FocusLost * silent! up
 " make use real tabs
 autocmd! FileType make set noexpandtab
 " automatic formatting on save
