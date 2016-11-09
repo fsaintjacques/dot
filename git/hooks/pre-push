@@ -1,4 +1,4 @@
-#! /bin/sh
+#! /usr/bin/env bash
 #
 # Copyright 2013 Chris Torek <chris.torek@gmail.com>
 # http://web.torek.net/torek/git/pre-receive.sh.txt
@@ -39,11 +39,9 @@ reftype()
 # hooks.branches.create.validate is set.
 check_branch_create()
 {
-    local validate regex
-
-    validate=$($GIT config --get --bool hooks.branches.create.validate)
+    local validate=$($GIT config --get --bool hooks.branches.create.validate)
     if [ "$validate" = true ]; then
-      regex=$($GIT config --get hooks.branches.create.regex)
+      local regex=$($GIT config --get hooks.branches.create.regex)
       if ! [[ $SHORTREF =~ $regex ]]; then
         anno=error
         STATUS=1
@@ -63,7 +61,9 @@ while read LOCAL_REF LOCAL_SHA REMOTE_REF REMOTE_SHA; do
     *,*) LOCAL_TYPE=$(reftype $LOCAL_REF); REMOTE_TYPE=$(reftype $REMOTE_SHA); CHANGE=update;;
     esac
 
-    if [ $LOCAL_TYPE == badref -o $REMOTE_TYPE == badref ]; then exit 1; fi
+    if [ "$LOCAL_TYPE" == "badref" -o "$REMOTE_TYPE" == "badref" ]; then
+      exit 1
+    fi
 
     case $LOCAL_REF in
     refs/heads/*)
