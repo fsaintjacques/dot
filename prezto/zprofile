@@ -41,7 +41,8 @@ if [[ -e /usr/libexec/java_home ]]; then
 fi
 
 for p in ~/.rvm/bin \
-         ~/.usr/bin; do
+         ~/.usr/bin \
+         ~/.bin ; do
   if [[ -d "$p" ]]; then
     path=($p
           $path)
@@ -52,11 +53,6 @@ CARGO=$HOME/.cargo/env
 
 if [[ -e $CARGO ]]; then
   source $CARGO
-fi
-
-if [[ -d ~/.bin ]]; then
-  path=($path
-        ~/.bin)
 fi
 
 # Set the list of directories that Zsh searches for programs.
