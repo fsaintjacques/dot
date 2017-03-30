@@ -76,9 +76,6 @@ let mapleader = ','
 " Enable the use of the mouse
 set mouse=a
 
-" Switch line-numbering from absolute/relative
-nnoremap <leader>l :set relativenumber!<cr>
-
 " Searching
 " When there is a previous search pattern, highlight all its matches. The type
 " of highlighting used can be set with the 'l' occasion in the 'highlight'
