@@ -62,3 +62,10 @@ __prompt_command() {
 
 	PS1="${prefix}${git_status} ${prev_status} "
 }
+
+# set paths
+for p in ~/.bin; do
+	if [ -d "$p" ]; then
+		PATH=${p}:$PATH
+	fi
+done
