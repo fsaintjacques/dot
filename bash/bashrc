@@ -1,0 +1,64 @@
+export LANG="en_US.UTF-8"
+export VISUAL=vim
+export EDITOR="$VISUAL"
+
+# common aliases
+alias ls="ls --color=auto"
+alias ll="ls -alh"
+
+# git aliases
+alias gs="git status"
+
+# Better history management
+export HISTCONTROL=ignoredups
+export HISTSIZE=10000
+export HISTIGNORE="ls:ll"
+shopt -s histappend
+
+# Colors
+export CLICOLOR=1
+export GCC_COLORS='error=01;31:warning=01;35:note=01;36:caret=01;32:locus=01:quote=01'
+
+export GIT_PS1_SHOWDIRTYSTATE=true
+export GIT_PS1_DESCRIBE_STYLE=tag
+#export GIT_PS1_SHOWUPSTREAM=auto
+export GIT_PS1_SHOWCOLORHINTS=true
+export GIT_PS1_DIRTYMARKER=✗
+
+# Load auto-completion (and possibly __git_ps1)
+if ! shopt -oq posix; then
+  if [ -f /usr/share/bash-completion/bash_completion ]; then
+    . /usr/share/bash-completion/bash_completion
+  elif [ -f /etc/bash_completion ]; then
+    . /etc/bash_completion
+  fi
+fi
+
+fuzzy_replace_filedir_xspec
+fuzzy_setup_for_command cd
+
+PROMPT_COMMAND=__prompt_command
+__prompt_command() {
+	local exit_code=$?
+
+	local red="\[$(tput setaf 1)\]"
+	local green="\[$(tput setaf 2)\]"
+	local white="\[$(tput setaf 15)\]"
+	local reset="\[$(tput sgr0)\]"
+	local bold="\[$(tput bold)\]"
+
+	local prefix="${bold}${white}\h:$(basename $PWD)/${reset}"
+
+	local git_status=""
+	if [ -n "$(type -t __git_ps1)" ]; then
+		git_status=$(__git_ps1)
+	fi
+
+	# sets last character to a fat red '!' if previous command failed.
+	local prev_status="\$"
+	if [[ $exit_code != 0 ]]; then
+		prev_status="${bold}${red}!${reset}"
+	fi
+
+	PS1="${prefix}${git_status} ${prev_status} "
+}
