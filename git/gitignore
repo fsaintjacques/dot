@@ -8,3 +8,4 @@
 
 # locals
 gdb/local.gdb
+*.gdb_history
