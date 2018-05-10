@@ -69,3 +69,8 @@ for p in ~/.bin ~/.cargo/bin; do
 		export PATH=${p}:$PATH
 	fi
 done
+
+GNOME_KEYRING_AGENT_SOCKET=/run/user/$(id -u)/keyring/.ssh
+if test -S ${GNOME_KEYRING_AGENT_SOCKET}; then
+	export SSH_AUTH_SOCK=${GNOME_KEYRING_AGENT_SOCKET}
+fi
