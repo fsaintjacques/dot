@@ -64,8 +64,8 @@ __prompt_command() {
 }
 
 # set paths
-for p in ~/.bin; do
+for p in ~/.bin ~/.cargo/bin; do
 	if [ -d "$p" ]; then
-		PATH=${p}:$PATH
+		export PATH=${p}:$PATH
 	fi
 done
