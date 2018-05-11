@@ -49,3 +49,5 @@
 
 [includeIf "gitdir:~/src/backtrace/"]
 	path = ~/src/backtrace/.gitconfig
+[commit]
+	verbose = true
