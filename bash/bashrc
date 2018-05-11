@@ -8,6 +8,10 @@ alias ll="ls -alh"
 
 # git aliases
 alias gs="git status"
+alias gd="git diff"
+alias ga="git add -p"
+alias gc="git commit"
+alias gk="git checkout"
 
 # Better history management
 export HISTCONTROL=ignoredups
