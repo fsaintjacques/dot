@@ -16,6 +16,9 @@ alias gp="git pull"
 alias gf="git fetch"
 alias gr="git rebase"
 
+# Disable ctrl-s/ctrl-q
+stty -ixon
+
 # Better history management
 export HISTCONTROL=ignoredups
 export HISTSIZE=10000
