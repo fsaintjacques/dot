@@ -1,9 +1,13 @@
+$include /etc/inputrc
+
 set meta-flag on
 set input-meta on
 set output-meta on
 set convert-meta off
 # required by fuzzy completion
 set show-all-if-ambiguous on
+# Allow rebinding C-w and others (see stty -a for a list of reserved)
+set bind-tty-special-chars off
 
 # By default up/down are bound to previous-history
 # and next-history respectively. The following does the
@@ -21,6 +25,9 @@ set show-all-if-ambiguous on
 # Option right/left to jump word
 "\e\e[C": forward-word
 "\e\e[D": backward-word
+"\C-u": kill-whole-line
+# Ensure C-w is using non-alphanumeric delimiters instead of whitespaces
+"\C-w": backward-kill-word
 
 $if Bash
   # F10 toggles mc on and off
@@ -30,7 +37,3 @@ $if Bash
   #do history expansion when space entered
   Space: magic-space
 $endif
-
-# Include system wide settings which are ignored
-# by default if one has their own .inputrc
-$include /etc/inputrc
