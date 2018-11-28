@@ -17,7 +17,9 @@ alias gf="git fetch"
 alias gr="git rebase"
 
 # Disable ctrl-s/ctrl-q
-stty -ixon
+case $(tty) in /dev/tty[0-9]*)
+  stty -ixon;;
+esac
 
 # Better history management
 export HISTCONTROL=ignoredups
