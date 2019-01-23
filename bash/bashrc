@@ -51,38 +51,47 @@ fuzzy_setup_for_command cd
 
 PROMPT_COMMAND=__prompt_command
 __prompt_command() {
-	local exit_code=$?
+  local exit_code=$?
 
-	local red="\[$(tput setaf 1)\]"
-	local green="\[$(tput setaf 2)\]"
-	local white="\[$(tput setaf 15)\]"
-	local reset="\[$(tput sgr0)\]"
-	local bold="\[$(tput bold)\]"
+  local red="\[$(tput setaf 1)\]"
+  local green="\[$(tput setaf 2)\]"
+  local white="\[$(tput setaf 15)\]"
+  local reset="\[$(tput sgr0)\]"
+  local bold="\[$(tput bold)\]"
 
-	local prefix="${bold}${white}\h:$(basename $PWD)/${reset}"
+  local prefix="${bold}${white}\h:$(basename $PWD)/${reset}"
 
-	local git_status=""
-	if [ -n "$(type -t __git_ps1)" ]; then
-		git_status=$(__git_ps1)
-	fi
+  local git_status=""
+  if [ -n "$(type -t __git_ps1)" ]; then
+    git_status=$(__git_ps1)
+  fi
 
-	# sets last character to a fat red '!' if previous command failed.
-	local prev_status="\$"
-	if [[ $exit_code != 0 ]]; then
-		prev_status="${bold}${red}!${reset}"
-	fi
+  # sets last character to a fat red '!' if previous command failed.
+  local prev_status="\$"
+  if [[ $exit_code != 0 ]]; then
+    prev_status="${bold}${red}!${reset}"
+  fi
 
-	PS1="${prefix}${git_status} ${prev_status} "
+  PS1="${prefix}${git_status} ${prev_status} "
 }
 
 # set paths
-for p in ~/.bin ~/.cargo/bin; do
-	if [ -d "$p" ]; then
-		export PATH=${p}:$PATH
-	fi
+for p in ~/.local/bin ~/.bin ~/.cargo/bin /usr/local/go/bin ~/go/bin; do
+  if [ -d "$p" ]; then
+    case ":$PATH:" in
+      *"$p:"*) :;; # do nothing
+      *) PATH="$p:$PATH";;
+    esac
+  fi
 done
 
-GNOME_KEYRING_AGENT_SOCKET=/run/user/$(id -u)/keyring/.ssh
+GNOME_KEYRING_AGENT_SOCKET=/run/user/$(id -u)/keyring/ssh
 if test -S ${GNOME_KEYRING_AGENT_SOCKET}; then
-	export SSH_AUTH_SOCK=${GNOME_KEYRING_AGENT_SOCKET}
+  export SSH_AUTH_SOCK=${GNOME_KEYRING_AGENT_SOCKET}
 fi
+
+[ -f ~/.fzf.bash ] && source ~/.fzf.bash
+
+# added by Miniconda3 installer
+# export PATH="/home/fsaintjacques/miniconda/bin:$PATH"
+. /home/fsaintjacques/miniconda/etc/profile.d/conda.sh

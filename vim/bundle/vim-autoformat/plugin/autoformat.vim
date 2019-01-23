@@ -1,10 +1,5 @@
 " Function for finding the formatters for this filetype
 " Result is stored in b:formatters
-
-if !exists('g:autoformat_autoindent')
-    let g:autoformat_autoindent = 1
-endif
-
 function! s:find_formatters(...)
     " Detect verbosity
     let verbose = &verbose || g:autoformat_verbosemode == 1
@@ -105,6 +100,11 @@ function! s:TryAllFormatters(...) range
         " once for getting the final expression
         let b:formatprg = eval(eval(formatdef_var))
 
+        if verbose
+            echomsg "Trying definition from ".formatdef_var
+            echomsg "Evaluated formatprg: ".b:formatprg
+        endif
+
         " Detect if +python or +python3 is available, and call the corresponding function
         if !has("python") && !has("python3")
             echohl WarningMsg |
@@ -113,11 +113,17 @@ function! s:TryAllFormatters(...) range
             return 1
         endif
         if has("python3")
+            if verbose
+                echomsg "Using python 3 code..."
+            endif
             let success = s:TryFormatterPython3()
         else
+            if verbose
+                echomsg "Using python 2 code..."
+            endif
             let success = s:TryFormatterPython()
         endif
-        if success
+        if success == 0
             if verbose
                 echomsg "Definition in '".formatdef_var."' was successful."
             endif
@@ -163,15 +169,15 @@ function! s:Fallback()
             echomsg "Autoindenting..."
         endif
         " Autoindent code
-        exe "normal gg=G"
+        exe "normal! gg=G"
     endif
 
 endfunction
 
 
 " Call formatter
-" If stderr is empty, apply result, return 1
-" Otherwise, return 0
+" If stderr is empty, apply result, return 0
+" Otherwise, return 1
 
 " +python version
 function! s:TryFormatterPython()
@@ -188,7 +194,7 @@ verbose = bool(int(vim.eval('verbose')))
 env = os.environ.copy()
 if int(vim.eval('exists("g:formatterpath")')):
     extra_path = vim.eval('g:formatterpath')
-    env['PATH'] = ':'.join(extra_path) + ':' + env['PATH']
+    env['PATH'] = os.pathsep.join(extra_path) + os.pathsep + env['PATH']
 
 # When an entry is unicode, Popen can't deal with it in Python 2.
 # As a pragmatic fix, we'll omit that entry.
@@ -200,12 +206,14 @@ env=newenv
 p = subprocess.Popen(formatprg, env=env, shell=True, stdin=PIPE, stdout=PIPE, stderr=PIPE)
 stdoutdata, stderrdata = p.communicate(text)
 
+formattername = vim.eval('b:formatters[s:index]')
 if stderrdata:
     if verbose:
-        formattername = vim.eval('b:formatters[s:index]')
-        print('Formatter {} has errors: {} Skipping.'.format(formattername, stderrdata))
-        print('Failing config: {}'.format(repr(formatprg), stderrdata))
-    vim.command('return 0')
+        print('Formatter {} has errors: {}'.format(formattername, stderrdata))
+    vim.command('return 1')
+elif p.returncode > 0:
+    if verbose:
+        print('Formatter {} gives nonzero returncode: {}'.format(formattername, p.returncode))
 else:
     # It is not certain what kind of line endings are being used by the format program.
     # Therefore we simply split on all possible eol characters.
@@ -223,10 +231,11 @@ else:
     for eol in possible_eols:
         lines = [splitline for line in lines for splitline in line.split(eol)]
 
-    vim.current.buffer[:] = lines
+    if vim.current.buffer[:] != lines:
+        vim.current.buffer[:] = lines
 EOF
 
-    return 1
+    return 0
 endfunction
 
 " +python3 version
@@ -238,57 +247,65 @@ python3 << EOF
 import vim, subprocess, os
 from subprocess import Popen, PIPE
 
+# The return code is `failure`, unless otherwise specified
+vim.command('return 1')
+
 text = bytes(os.linesep.join(vim.current.buffer[:]) + os.linesep, 'utf-8')
 formatprg = vim.eval('b:formatprg')
 verbose = bool(int(vim.eval('verbose')))
 env = os.environ.copy()
 if int(vim.eval('exists("g:formatterpath")')):
     extra_path = vim.eval('g:formatterpath')
-    env['PATH'] = ':'.join(extra_path) + ':' + env['PATH']
+    env['PATH'] = os.pathsep.join(extra_path) + os.pathsep + env['PATH']
 
-p = subprocess.Popen(formatprg, env=env, shell=True, stdin=PIPE, stdout=PIPE, stderr=PIPE)
-stdoutdata, stderrdata = p.communicate(text)
-if stderrdata:
+try:
+    p = subprocess.Popen(formatprg, env=env, shell=True, stdin=PIPE, stdout=PIPE, stderr=PIPE)
+    stdoutdata, stderrdata = p.communicate(text)
+except (BrokenPipeError, IOError):
     if verbose:
-        formattername = vim.eval('b:formatters[s:index]')
-        print('Formatter {} has errors: {} Skipping.'.format(formattername, stderrdata))
-        print('Failing config: {}'.format(repr(formatprg), stderrdata))
-    vim.command('return 0')
+        raise
 else:
-    # It is not certain what kind of line endings are being used by the format program.
-    # Therefore we simply split on all possible eol characters.
-    possible_eols = ['\r\n', os.linesep, '\r', '\n']
+    formattername = vim.eval('b:formatters[s:index]')
+    if stderrdata:
+        if verbose:
+            print('Formatter {} has errors: {}'.format(formattername, stderrdata))
+    elif p.returncode > 0:
+        if verbose:
+            print('Formatter {} gives nonzero returncode: {}'.format(formattername, p.returncode))
+    elif not stdoutdata:
+        if verbose:
+            print('Formatter {} gives empty result: {}'.format(formattername, stderrdata))
+    else:
+        # It is not certain what kind of line endings are being used by the format program.
+        # Therefore we simply split on all possible eol characters.
+        possible_eols = ['\r\n', os.linesep, '\r', '\n']
 
-    stdoutdata = stdoutdata.decode('utf-8')
+        stdoutdata = stdoutdata.decode('utf-8')
 
-    # Often shell commands will append a newline at the end of their output.
-    # It is not entirely clear when and why that happens.
-    # However, extra newlines are almost never required, while there are linters that complain
-    # about superfluous newlines, so we remove one empty newline at the end of the file.
-    for eol in possible_eols:
-        if len(stdoutdata) > 0 and stdoutdata[-1] == eol:
-            stdoutdata = stdoutdata[:-1]
+        # Often shell commands will append a newline at the end of their output.
+        # It is not entirely clear when and why that happens.
+        # However, extra newlines are almost never required, while there are linters that complain
+        # about superfluous newlines, so we remove one empty newline at the end of the file.
+        for eol in possible_eols:
+            if len(stdoutdata) > 0 and stdoutdata[-1] == eol:
+                stdoutdata = stdoutdata[:-1]
 
-    lines = [stdoutdata]
-    for eol in possible_eols:
-        lines = [splitline for line in lines for splitline in line.split(eol)]
+        lines = [stdoutdata]
+        for eol in possible_eols:
+            lines = [splitline for line in lines for splitline in line.split(eol)]
 
-    vim.current.buffer[:] = lines
+        if vim.current.buffer[:] != lines:
+            vim.current.buffer[:] = lines
+        vim.command('return 0')
 EOF
-
-    return 1
 endfunction
 
 
-" This is a custom patched version to support CentOS 6 running vim 7.1, see
-" https://github.com/Chiel92/vim-autoformat/issues/38
-if v:version >= 703
-    " Create a command for formatting the entire buffer
-    " Save and recall window state to prevent vim from jumping to line 1
-    command! -nargs=? -range=% -complete=filetype Autoformat let winview=winsaveview()|<line1>,<line2>call s:TryAllFormatters(<f-args>)|call winrestview(winview)
-else
-    command! Autoformat call s:Autoformat()
-endif
+" Create a command for formatting the entire buffer
+" Save and recall window state to prevent vim from jumping to line 1
+" Write and read viminfo to restore marks
+command! -nargs=? -range=% -complete=filetype -bar Autoformat let winview=winsaveview()|wviminfo|<line1>,<line2>call s:TryAllFormatters(<f-args>)|call winrestview(winview)|rviminfo
+
 
 " Functions for iterating through list of available formatters
 function! s:NextFormatter()
@@ -334,6 +351,3 @@ function! s:RemoveTrailingSpaces()
     endtry
 endfunction
 command! RemoveTrailingSpaces call s:RemoveTrailingSpaces()
-
-" Put the uncopyable messages text into the buffer
-command! PutMessages redir @" | messages | redir END | put
