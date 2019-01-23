@@ -90,8 +90,17 @@ if test -S ${GNOME_KEYRING_AGENT_SOCKET}; then
   export SSH_AUTH_SOCK=${GNOME_KEYRING_AGENT_SOCKET}
 fi
 
-[ -f ~/.fzf.bash ] && source ~/.fzf.bash
+source_if_exists() {
+  local file=$1
 
-# added by Miniconda3 installer
-# export PATH="/home/fsaintjacques/miniconda/bin:$PATH"
-. /home/fsaintjacques/miniconda/etc/profile.d/conda.sh
+  [ -f "$file" ] && source "$file"
+}
+
+INCLUDES=(
+ ~/.fzf.bash
+ ~/miniconda/etc/profile.d/conda.sh
+)
+
+for f in "${INCLUDES[@]}"; do
+  source_if_exists "$f"
+done
