@@ -18,6 +18,8 @@ source ~/.config/gdb/dashboard.gdb
 
 source ~/.config/gdb/local.gdb
 
+source ~/.config/gdb/ninja.gdb
+
 # Ensure stl pretty printers works with conda
 python
 import sys
