@@ -223,6 +223,7 @@ set hidden
 let g:LanguageClient_serverCommands = {
     \ 'cpp': ['/usr/local/bin/cquery', '--log-file=/var/lib/cquery/cquery.log', '--init={"cacheDirectory":"/var/lib/cquery/cache"}'],
     \ 'python': ['/home/fsaintjacques/.local/bin/pyls'],
+    \ 'go': ['/home/fsaintjacques/go/bin/gopls'],
     \ }
 
 " Show small description (comment) under cursor

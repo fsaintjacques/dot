@@ -12,8 +12,12 @@ Plug 'ctrlpvim/ctrlp.vim'
 Plug 'easymotion/vim-easymotion'
 Plug 'tpope/vim-surround'
 
+Plug 'fatih/vim-go', { 'do': ':GoUpdateBinaries' }
+
 " Provide easy code formatting in Vim by integrating existing code formatters.
 Plug 'Chiel92/vim-autoformat'
+
+Plug 'cespare/vim-toml'
 
 " Vim plugin for clang-format, a formatter for C, C++, Obj-C, Java, JavaScript,
 " TypeScript and ProtoBuf.
