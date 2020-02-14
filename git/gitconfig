@@ -23,7 +23,6 @@
   excludesfile = ~/.gitignore
   whitespace = fix
   pager = diff-highlight | less -r
-  hookspath = ~/src/dot/git/hooks
 [branch]
   autosetupmerge = always
   autosetuprebase = local
@@ -47,7 +46,5 @@
 [url "git://gist.github.com/"]
   insteadOf = "gist:"
 
-[includeIf "gitdir:~/src/backtrace/"]
-	path = ~/src/backtrace/.gitconfig
 [commit]
 	verbose = true

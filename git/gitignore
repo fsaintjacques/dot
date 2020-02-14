@@ -11,3 +11,5 @@ gdb/local.gdb
 *.gdb_history
 .ctrlp
 compile_commands.json
+# clangd local cache
+*.clangd

@@ -6,11 +6,9 @@ Plug 'tpope/vim-fugitive'
 " A tree explorer plugin for vim.
 Plug 'scrooloose/nerdtree'
 
-" Fuzzy file, buffer, mru, tag, etc finder.
-Plug 'ctrlpvim/ctrlp.vim'
-
 Plug 'easymotion/vim-easymotion'
 Plug 'tpope/vim-surround'
+Plug 'tpope/vim-repeat'
 
 Plug 'fatih/vim-go', { 'do': ':GoUpdateBinaries' }
 
@@ -18,6 +16,7 @@ Plug 'fatih/vim-go', { 'do': ':GoUpdateBinaries' }
 Plug 'Chiel92/vim-autoformat'
 
 Plug 'cespare/vim-toml'
+Plug 'jceb/vim-orgmode'
 
 " Vim plugin for clang-format, a formatter for C, C++, Obj-C, Java, JavaScript,
 " TypeScript and ProtoBuf.
@@ -39,5 +38,7 @@ Plug 'roxma/nvim-yarp'
 Plug 'roxma/vim-hug-neovim-rpc'
 
 Plug 'solarnz/thrift.vim'
+
+Plug '~/.vim/bundle/llvm'
 
 call plug#end()
