@@ -105,7 +105,6 @@ if exists('+undofile')
 endif
 set backupdir=~/.vim/tmp/backups
 set directory=~/.vim/tmp/swaps
-set viminfo+=n~/.vim/tmp/viminfo
 
 " Nicer text navigation
 " The problem with the often used
