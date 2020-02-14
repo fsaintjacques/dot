@@ -35,6 +35,9 @@ export GIT_PS1_DESCRIBE_STYLE=tag
 export GIT_PS1_SHOWCOLORHINTS=true
 export GIT_PS1_DIRTYMARKER=✗
 
+# Run tests in parallel by default with ctest
+export CTEST_PARALLEL_LEVEL=$(nproc)
+
 # Load auto-completion (and possibly __git_ps1)
 if ! shopt -oq posix; then
   if [ -f /usr/share/bash-completion/bash_completion ]; then
