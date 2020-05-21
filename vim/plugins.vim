@@ -1,14 +1,14 @@
 call plug#begin('~/.vim/bundle')
 
-" A Git wrapper so awesome, it should be illegal
-Plug 'tpope/vim-fugitive'
 
 " A tree explorer plugin for vim.
-Plug 'scrooloose/nerdtree'
+Plug 'preservim/nerdtree'
+Plug 'preservim/nerdcommenter'
 
 Plug 'easymotion/vim-easymotion'
-Plug 'tpope/vim-surround'
+Plug 'tpope/vim-fugitive'
 Plug 'tpope/vim-repeat'
+Plug 'tpope/vim-surround'
 
 Plug 'fatih/vim-go', { 'do': ':GoUpdateBinaries' }
 

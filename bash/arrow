@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+
+: ${ARROW_HOME:=$HOME/src/db/arrow}
+: ${ARROW_CPP_BUILD_ROOT:=${ARROW_HOME}/cpp/build}
+
+export PARQUET_TEST_DATA=${ARROW_HOME}/cpp/submodules/parquet-testing/data
+export ARROW_TEST_DATA=${ARROW_HOME}/testing/data
+
+arrow-build() {
+  local build=$1
+  local build_path="${ARROW_CPP_BUILD_ROOT}/${build}"
+
+  shift
+
+  cmake --build "${build_path}" $@
+}

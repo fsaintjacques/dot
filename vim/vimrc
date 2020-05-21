@@ -161,6 +161,10 @@ autocmd! BufRead,BufNewFile *.avsc set ft=javascript
 autocmd! BufRead,BufNewFile *.proto set ft=proto
 autocmd! BufRead,BufNewFile *.thrift set filetype=thrift
 
+" Use /// comments by default for C++ as per Arrow style guide
+autocmd! FileType cpp setlocal comments-=:// comments+=:///
+set comments-=:// comments+=:///
+
 " Close vim if NERDTree is the only buffer left
 autocmd! WinEnter * call CloseIfOnlyNerdTreeLeft()
 " Remove trailing whitespaces
@@ -172,7 +176,7 @@ autocmd! FocusLost * silent! up
 " QuickFix window close automatically when selecting a file
 autocmd! FileType qf nnoremap <buffer> <CR> <C-w><CR>:cclose<CR>
 
-filetype plugin indent on
+filetype plugin on
 
 "
 " Plugins
@@ -194,6 +198,12 @@ let g:NERDTreeDirArrows   = 1
 let g:NERDTreeHijackNetrw = 0
 let g:NERDTreeWinsize     = 30
 
+" nerdcommenter
+let g:NERDAltDelims_cpp = 1
+let g:NERDCustomDelimiters = {
+  \ 'cpp': { 'left': '///', 'leftAlt': '/*', 'rightAlt': '*/' },
+\ }
+
 " fzf
 nmap <C-p> :FZF<cr>
 nmap <leader>f :FZF<cr>
@@ -205,25 +215,13 @@ let g:autoformat_remove_trailing_spaces = 1
 let g:autoformat_verbosemode = 0
 map <leader>a :Autoformat<cr>
 
-" neomake
-" Full config: when writing or reading a buffer, and on changes in insert and
-" normal mode (after 1s; no delay when writing).
-" let g:neomake_cpp_enabled_makers = ['clang', 'clangtidy']
-" call neomake#configure#automake('nrwi', 500)
-
-
 " LanguageClient
 set runtimepath+=~/.vim/bundle/LanguageClient-neovim
 " Required for operations modifying multiple buffers like rename.
 set hidden
 
-" let g:LanguageClient_serverCommands = {
-"     \ 'cpp': ['/usr/local/bin/cquery', '--log-file=/var/lib/cquery/cquery.log', '--init={"cacheDirectory":"/var/lib/cquery/cache"}'],
-"     \ 'python': ['/home/fsaintjacques/.local/bin/pyls'],
-"     \ }
-"
 let g:LanguageClient_serverCommands = {
-    \ 'cpp': ['clangd-9', '--header-insertion=never'],
+    \ 'cpp': ['clangd-10', '--header-insertion=never'],
     \ 'python': ['/home/fsaintjacques/.local/bin/pyls'],
     \ 'go': ['/home/fsaintjacques/go/bin/gopls'],
     \ }
@@ -240,6 +238,10 @@ nnoremap <silent> <F2> :call LanguageClient#textDocument_rename()<CR>
 
 " Use deoplete.
 let g:deoplete#enable_at_startup = 1
+call deoplete#custom#option('auto_complete', v:false)
+call deoplete#custom#source('_', 'matchers', ['matcher_full_fuzzy'])
+
+
 " In insert mode, checks if the autocomplete menu is active, if so binds to
 " deoplete C-n, otherwise insert standard tab.
 inoremap <expr><tab> pumvisible() ? "\<C-n>" : "\<tab>"

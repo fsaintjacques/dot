@@ -1,3 +1,7 @@
+# Directory of the current file
+THIS=$(readlink "${BASH_SOURCE[0]}")
+DOT_SRC="$( cd "$(dirname "${THIS}")/.." && pwd )"
+
 if-found() {
   local cmd=$1
   which ${cmd} 1>&2 > /dev/null
@@ -36,6 +40,7 @@ export GIT_PS1_SHOWCOLORHINTS=true
 export GIT_PS1_DIRTYMARKER=✗
 
 # Run tests in parallel by default with ctest
+export GTEST_BREAK_ON_FAILURE=1
 export CTEST_PARALLEL_LEVEL=$(nproc)
 
 # Load auto-completion (and possibly __git_ps1)
@@ -97,6 +102,7 @@ source_if_exists() {
 }
 
 INCLUDES=(
+ ${DOT_SRC}/bash/arrow
  ~/.fzf.bash
  ~/miniconda/etc/profile.d/conda.sh
  /usr/share/bash-completion/completions/git
@@ -120,16 +126,14 @@ if declare -F __git_complete &> /dev/null; then
   __git_complete gr _git_rebase
 fi
 
-export NVM_DIR="$HOME/.nvm"
-[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
-[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
+#export NVM_DIR="$HOME/.nvm"
+#[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
+#[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
 
 # fd respects .gitignore
 export FZF_DEFAULT_COMMAND='fd --type f'
 export FZF_DEFAULT_OPTS="--preview 'bat --color=always --line-range :100 {}'"
 export FZF_TMUX_HEIGHT="60%"
-
-
 
 if if-found exa; then
   alias ls=exa
@@ -137,6 +141,14 @@ fi
 
 if if-found bat; then
   alias cat=bat
+fi
+
+if if-found rg; then
+  alias ag=rg
+fi
+
+if if-found fd; then
+  alias find=fd
 fi
 
 alias ll="ls -alh"
