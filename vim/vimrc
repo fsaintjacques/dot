@@ -209,6 +209,8 @@ let g:autoformat_autoindent = 1
 let g:autoformat_retab = 1
 let g:autoformat_remove_trailing_spaces = 1
 let g:autoformat_verbosemode = 0
+let g:formatdef_terraform_fmt = '"terraform fmt -"'
+let g:formatters_terraform = ['terraform_fmt']
 map <leader>a :Autoformat<cr>
 
 " LanguageClient
