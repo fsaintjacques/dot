@@ -10,7 +10,11 @@ Plug 'tpope/vim-fugitive'
 Plug 'tpope/vim-repeat'
 Plug 'tpope/vim-surround'
 
+" Go language support
 Plug 'fatih/vim-go', { 'do': ':GoUpdateBinaries' }
+
+" Terraform language support
+Plug 'hashivim/vim-terraform'
 
 " Provide easy code formatting in Vim by integrating existing code formatters.
 Plug 'Chiel92/vim-autoformat'

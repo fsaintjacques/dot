@@ -31,7 +31,7 @@
   followTags = true
 [pull]
   ff = only
-  rebase = preserve
+  rebase = merges
 # https://gist.github.com/833086
 [url "git@github.com:"]
   insteadOf = "gh:"

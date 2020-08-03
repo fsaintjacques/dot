@@ -161,10 +161,6 @@ autocmd! BufRead,BufNewFile *.avsc set ft=javascript
 autocmd! BufRead,BufNewFile *.proto set ft=proto
 autocmd! BufRead,BufNewFile *.thrift set filetype=thrift
 
-" Use /// comments by default for C++ as per Arrow style guide
-autocmd! FileType cpp setlocal comments-=:// comments+=:///
-set comments-=:// comments+=:///
-
 " Close vim if NERDTree is the only buffer left
 autocmd! WinEnter * call CloseIfOnlyNerdTreeLeft()
 " Remove trailing whitespaces
@@ -238,9 +234,12 @@ nnoremap <silent> <F2> :call LanguageClient#textDocument_rename()<CR>
 
 " Use deoplete.
 let g:deoplete#enable_at_startup = 1
-call deoplete#custom#option('auto_complete', v:false)
 call deoplete#custom#source('_', 'matchers', ['matcher_full_fuzzy'])
 
+nmap <leader>t :GoTest<cr>
+
+" Enable neomake when writing a buffer (no delay).
+call neomake#configure#automake('w')
 
 " In insert mode, checks if the autocomplete menu is active, if so binds to
 " deoplete C-n, otherwise insert standard tab.
