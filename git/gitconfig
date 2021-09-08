@@ -23,6 +23,7 @@
   excludesfile = ~/.gitignore
   whitespace = fix
   pager = diff-highlight | less -r
+	attributesfile = /home/fsaintjacques/.gitattributes
 [branch]
   autosetupmerge = always
   autosetuprebase = local

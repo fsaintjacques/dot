@@ -10,13 +10,12 @@ if-found() {
 
 export LANG="en_US.UTF-8"
 export VISUAL=vim
-if if-found nvim; then
-  export VISUAL=nvim
-  alias vim=nvim
-  alias vi=nvim
-fi
+#if if-found nvim; then
+#  export VISUAL=nvim
+#  alias vim=nvim
+#  alias vi=nvim
+#fi
 export EDITOR="$VISUAL"
-
 
 # Disable ctrl-s/ctrl-q
 case $(tty) in /dev/tty[0-9]*)
@@ -82,7 +81,7 @@ __prompt_command() {
 }
 
 # set paths
-for p in ~/.local/bin ~/.bin ~/.cargo/bin /usr/local/go/bin ~/go/bin; do
+for p in ~/.local/bin ~/.bin ~/.cargo/bin /usr/local/go/bin ~/go/bin ~/.config/node/bin; do
   if [ -d "$p" ]; then
     case ":$PATH:" in
       *"$p:"*) :;; # do nothing
@@ -126,39 +125,31 @@ if declare -F __git_complete &> /dev/null; then
   __git_complete gr _git_rebase
 fi
 
-#export NVM_DIR="$HOME/.nvm"
-#[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
-#[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
-
 # fd respects .gitignore
 export FZF_DEFAULT_COMMAND='fd --type f'
 export FZF_DEFAULT_OPTS="--preview 'bat --color=always --line-range :100 {}'"
 export FZF_TMUX_HEIGHT="60%"
 
+# Docker use buildkit
+export DOCKER_CLI_EXPERIMENTAL=enabled
+export DOCKER_BUILDKIT=1
+export BUILDKIT_INLINE_CACHE=1
+export COMPOSE_DOCKER_CLI_BUILD=1
+
+# local minio
+AWS_REGION="minio"
+AWS_ACCESS_KEY_ID="minioaccess"
+AWS_SECRET_ACCESS_KEY="miniosecret"
+
 if if-found exa; then
   alias ls=exa
-fi
-
-if if-found bat; then
-  alias cat=bat
 fi
 
 if if-found rg; then
   alias ag=rg
 fi
 
-if if-found fd; then
-  alias find=fd
-fi
-
 alias ll="ls -alh"
-
-tmux-arrow() {
-  # run vim under bash such that proper initialization is done, notably
-  # disabling SIGSTOP via stty
-  local command="bash -c 'nvim'"
-  tmux new-session -DAs arrow -c ~/src/db/arrow -n vim "${command}"
-}
 
 # git aliases
 alias g=git
@@ -172,3 +163,31 @@ alias gb="git branch"
 alias gm="git merge"
 alias gf="git fetch"
 alias gr="git rebase"
+
+alias dc="docker-compose"
+
+
+esha() {
+  local e;
+  e=$(echo -n "$1" |tr A-Z a-z| tr -d ' \t\n' |sha256sum | cut -f1 -d' ')
+  echo "e:$e"
+}
+
+ocli-cfg() {
+  echo --config="~/.config/optable/optable-cli-$1.conf"
+}
+
+# >>> conda initialize >>>
+# !! Contents within this block are managed by 'conda init' !!
+__conda_setup="$('/home/fsaintjacques/miniconda3/bin/conda' 'shell.bash' 'hook' 2> /dev/null)"
+if [ $? -eq 0 ]; then
+    eval "$__conda_setup"
+else
+    if [ -f "/home/fsaintjacques/miniconda3/etc/profile.d/conda.sh" ]; then
+        . "/home/fsaintjacques/miniconda3/etc/profile.d/conda.sh"
+    else
+        export PATH="/home/fsaintjacques/miniconda3/bin:$PATH"
+    fi
+fi
+unset __conda_setup
+# <<< conda initialize <<<

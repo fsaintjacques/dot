@@ -1,6 +1,5 @@
 call plug#begin('~/.vim/bundle')
 
-
 " A tree explorer plugin for vim.
 Plug 'preservim/nerdtree'
 Plug 'preservim/nerdcommenter'
@@ -16,33 +15,40 @@ Plug 'fatih/vim-go', { 'do': ':GoUpdateBinaries' }
 " Terraform language support
 Plug 'hashivim/vim-terraform'
 
+Plug 'ycm-core/YouCompleteMe'
+
+" Javascript/TypeScript
+Plug 'leafgarland/typescript-vim' " TypeScript syntax
+Plug 'peitalin/vim-jsx-typescript'
+" Plug 'mhartington/nvim-typescript', {'do': ':!install.sh \| UpdateRemotePlugins'}
+Plug 'HerringtonDarkholme/yats.vim'
+
 " Provide easy code formatting in Vim by integrating existing code formatters.
 Plug 'Chiel92/vim-autoformat'
 
 Plug 'cespare/vim-toml'
 Plug 'jceb/vim-orgmode'
 
-" Vim plugin for clang-format, a formatter for C, C++, Obj-C, Java, JavaScript,
-" TypeScript and ProtoBuf.
-Plug 'rhysd/vim-clang-format'
-
 " Asynchronous linting and make framework for Neovim/Vim
-Plug 'neomake/neomake'
+" Plug 'neomake/neomake'
 
 " Language Server Protocol (LSP) support for vim and neovim.
-Plug 'autozimu/LanguageClient-neovim', { 'branch': 'next', 'do': 'bash install.sh', }
+" Plug 'autozimu/LanguageClient-neovim', { 'branch': 'next', 'do': 'bash install.sh', }
 
 "
-Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
+Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': { -> fzf#install() } }
+Plug 'junegunn/fzf.vim'
 
 " Deoplete is the abbreviation of "dark powered neo-completion". It provides an
 " extensible and asynchronous completion framework for neovim/Vim8.
-Plug 'Shougo/deoplete.nvim'
-Plug 'roxma/nvim-yarp'
-Plug 'roxma/vim-hug-neovim-rpc'
+" Plug 'Shougo/deoplete.nvim'
+" Plug 'roxma/nvim-yarp'
+" Plug 'roxma/vim-hug-neovim-rpc'
 
-Plug 'solarnz/thrift.vim'
+" Plug 'solarnz/thrift.vim'
 
 Plug '~/.vim/bundle/llvm'
+
+Plug 'editorconfig/editorconfig-vim'
 
 call plug#end()

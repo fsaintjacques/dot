@@ -194,15 +194,9 @@ let g:NERDTreeDirArrows   = 1
 let g:NERDTreeHijackNetrw = 0
 let g:NERDTreeWinsize     = 30
 
-" nerdcommenter
-let g:NERDAltDelims_cpp = 1
-let g:NERDCustomDelimiters = {
-  \ 'cpp': { 'left': '///', 'leftAlt': '/*', 'rightAlt': '*/' },
-\ }
-
 " fzf
 nmap <C-p> :FZF<cr>
-nmap <leader>f :FZF<cr>
+nmap <leader>f :Rg <C-R><C-W><CR>
 
 " vim-autoformat configurations
 let g:autoformat_autoindent = 1
@@ -210,42 +204,39 @@ let g:autoformat_retab = 1
 let g:autoformat_remove_trailing_spaces = 1
 let g:autoformat_verbosemode = 0
 let g:formatdef_terraform_fmt = '"terraform fmt -"'
+let g:formatdef_prettier_ts_fmt = '"prettier --parser=typescript"'
 let g:formatters_terraform = ['terraform_fmt']
+let g:formatters_typescript = ['prettier_ts_fmt']
+let g:formatters_typescriptreact = ['prettier_ts_fmt']
 map <leader>a :Autoformat<cr>
 
-" LanguageClient
-set runtimepath+=~/.vim/bundle/LanguageClient-neovim
 " Required for operations modifying multiple buffers like rename.
 set hidden
 
-let g:LanguageClient_serverCommands = {
-    \ 'cpp': ['clangd-10', '--header-insertion=never'],
-    \ 'python': ['/home/fsaintjacques/.local/bin/pyls'],
-    \ 'go': ['/home/fsaintjacques/go/bin/gopls'],
-    \ }
+" YouCompleteMe
+let g:ycm_language_server =
+  \ [
+  \   {
+  \     'name': 'terraform',
+  \     'cmdline': [ '/home/fsaintjacques/.bin/terraform-ls', 'serve' ],
+  \     'filetypes': [ 'terraform' ]
+  \   }
+  \ ]
+
+" Trigger the `CursorHold` after `updatetime` milliseconds, which in turns will
+" make YcmCompleter show the documention of token under the cursor.
+set updatetime=1000
 
 " Show small description (comment) under cursor
-nnoremap <silent> K :call LanguageClient#textDocument_hover()<CR>
+nnoremap <silent> gm :YcmCompleter GetDoc<CR>
 " Goto definition under cursor
-nnoremap <silent> gd :call LanguageClient#textDocument_definition()<CR>
-" Goto implementation under cursor
-nnoremap <silent> gi :call LanguageClient#textDocument_implementation()<CR>
+nnoremap <silent> gd :YcmCompleter GoTo<CR>
 " Goto references (usages) under cursor
-nnoremap <silent> gr :call LanguageClient_textDocument_references()<CR>
-nnoremap <silent> <F2> :call LanguageClient#textDocument_rename()<CR>
-
-" Use deoplete.
-let g:deoplete#enable_at_startup = 1
-call deoplete#custom#source('_', 'matchers', ['matcher_full_fuzzy'])
-
+nnoremap <silent> gr :YcmCompleter GoToReferences<CR>
+" Run golang tests
 nmap <leader>t :GoTest<cr>
 
-" Enable neomake when writing a buffer (no delay).
-call neomake#configure#automake('w')
 
-" In insert mode, checks if the autocomplete menu is active, if so binds to
-" deoplete C-n, otherwise insert standard tab.
-inoremap <expr><tab> pumvisible() ? "\<C-n>" : "\<tab>"
 
 " Local configuration overrides everything
 if filereadable(expand('~/.vimrc.local'))
