@@ -33,3 +33,4 @@ tmux:
 vim:
 	ln -snf $(DOT_SRC)/vim/vimrc ~/.vimrc
 	ln -sTf $(DOT_SRC)/vim ~/.vim
+	mkdir -p ~/.vim/tmp/{undos,backups,swaps}

@@ -90,9 +90,14 @@ for p in ~/.local/bin ~/.bin ~/.cargo/bin /usr/local/go/bin ~/go/bin ~/.config/n
   fi
 done
 
+# Use gnome-keyring if found
 GNOME_KEYRING_AGENT_SOCKET=/run/user/$(id -u)/keyring/ssh
+SSH_AGENT_SOCKET=${HOME}/.ssh/agent.socket
+SSH_AGENT_ENV=${HOME}/.ssh/agent.env
 if test -S ${GNOME_KEYRING_AGENT_SOCKET}; then
   export SSH_AUTH_SOCK=${GNOME_KEYRING_AGENT_SOCKET}
+elif ! test -S "${SSH_AGENT_SOCKET}"; then
+  ssh-agent -a "${SSH_AGENT_SOCKET}"|grep -vE '^echo' > "${SSH_AGENT_ENV}"
 fi
 
 source_if_exists() {
@@ -105,6 +110,7 @@ INCLUDES=(
  ~/.fzf.bash
  ~/miniconda/etc/profile.d/conda.sh
  /usr/share/bash-completion/completions/git
+ "${SSH_AGENT_ENV}"
 )
 
 for f in "${INCLUDES[@]}"; do
